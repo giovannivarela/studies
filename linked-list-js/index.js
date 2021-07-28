@@ -1,4 +1,4 @@
-'use strict';
+const assert = require('assert/strict');
 
 class Node {
   #element;
@@ -63,20 +63,22 @@ class LinkedList {
     
     let node = new Node(element);
     let current = this.#head;
+    let previous = this.#head;
     let internalPosition = 0;
 
-    while(current.getNext()){
+    do {
       if(position == internalPosition){
-        node.setNext(current.getNext())
-        current.setNext(node);
+        node.setNext(current);
+        previous.setNext(node)
         this.#length++;
 
         break;
       }
 
       internalPosition++;
+      previous = current;
       current = current.getNext();
-    }
+    } while(current.getNext())
   }
 
   removeAt(position){
@@ -109,19 +111,27 @@ class LinkedList {
       throw new Error("Empty list.")
 
     let current = this.#head;
-    let beforeCurrent = this.#head;
+    let previous = this.#head;
+    let position = 0;
 
-    while(current.getNext()){
-      if(current.getElement() == element){
-        beforeCurrent.setNext(current.getNext())
+    do {
+      try {
+        assert.deepStrictEqual(current.getElement(), element);
+        
+        position == 0 ? this.#head = current.getNext() : previous.setNext(current.getNext())
         this.#length--;
 
         break;
+      } catch(e) {
+        if(e.code !== 'ERR_ASSERTION')
+          throw new Error(e)
       }
 
-      beforeCurrent = current;
+      previous = current;
       current = current.getNext();
-    }
+      
+      position++;
+    } while(current.getNext());
   }
 
   pop(){
@@ -137,12 +147,16 @@ class LinkedList {
     let position = 0;
 
     while(current.getNext()){
-      if(current.getElement() == element){
+      try {
+        assert.deepStrictEqual(current.getNext(), element);
         break;
+      } catch(e) {
+        if(e.code !== 'ERR_ASSERTION')
+          throw new Error(e)
       }
 
       current = current.getNext();
-      position++;
+      position++;  
     }
 
     return position;
@@ -160,25 +174,23 @@ class LinkedList {
     let current = this.#head;
     if(this.#head == null)
       throw new Error("Empty list.")
-    if(this.#head.getNext() == null)
-      current.printElement();
 
     while(current.getNext()){
       current.printElement();  
       current = current.getNext();
     }
+
+    current.printElement();
   }
 }
 
 let linkedList = new LinkedList();
 
-linkedList.append(11);
-console.log('-----------------------------------------');
-linkedList.print();
 linkedList.append(15);
 linkedList.append(18);
 linkedList.append(34);
 linkedList.append(56);
+linkedList.append({teste: 'teste'});
 linkedList.insert(2, 22);
 console.log('-----------------------------------------');
 linkedList.print();
@@ -189,4 +201,4 @@ linkedList.removeAt(2);
 console.log('-----------------------------------------');
 linkedList.print();
 console.log("---------------------------------")
-console.log(linkedList.indexOf(34));
+console.log(linkedList.indexOf({teste: 'teste'}));
