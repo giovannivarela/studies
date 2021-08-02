@@ -20,6 +20,9 @@ if(cluster.isMaster) {
     much higher than the previous tests. This behaviour indicates that in a cluster the libuv tries to execute
     all the threads at the same time, delegating the management to the SO, wich gives all the threads equal
     time to complete.
+    This happens because each worker in the cluster create a thread pool of 4 threads to execute their actions
+    and when all those threads get in the SO the scheduler tries to accommodate everyone. In the other example
+    that would not happen because there where only one process, so 4 threads.
   */
   console.log('I am a fork!');
   logHashTime();
